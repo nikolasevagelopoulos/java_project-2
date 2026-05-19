@@ -1,0 +1,2 @@
+type:CustomerPaymentRequest,requestId:CPRQ202604201200332323,referenceId:RF1774626096924402,timestamp:2026-04-20T09:00:00,vat:444555666,amount:1040.0
+type:RentalCancelationRequest,requestId:RCQ202604200001,referenceId:RF1774626096924588,timestamp:2026-04-20T10:00:00,vat:444555666

@@ -1,0 +1,16 @@
+type:PassengerCar,plate:ABC-1234,make:Toyota,model:Yaris,transmission:Manual,year:2020,category:Standard
+type:PassengerCar,plate:XYZ-5678,make:VW,model:Golf,transmission:Automatic,year:2019,category:Standard
+type:PassengerCar,plate:MNO-9012,make:Nissan,model:Qashqai,transmission:Manual,year:2021,category:Premium
+type:CommercialVan,plate:DEF-3456,make:Ford,model:Transit,transmission:Automatic,year:2018,category:Standard
+type:PassengerCar,plate:PQR-7890,make:Hyundai,model:i20,transmission:Manual,year:2020,category:Economy
+type:PassengerCar,plate:STU-1234,make:Opel,model:Corsa,transmission:Automatic,year:2019,category:Economy
+type:CommercialVan,plate:VWX-5678,make:Mercedes,model:Sprinter,transmission:Automatic,year:2020,category:Premium
+type:PassengerCar,plate:YZA-9012,make:Fiat,model:500,transmission:Manual,year:2018,category:Economy
+type:PassengerCar,plate:BCD-3456,make:Peugeot,model:208,transmission:Manual,year:2019,category:Standard
+type:CommercialVan,plate:EFG-7890,make:Renault,model:Master,transmission:Automatic,year:2018,category:Premium
+type:PassengerCar,plate:HIJ-1234,make:Skoda,model:Octavia,transmission:Automatic,year:2020,category:Standard
+type:PassengerCar,plate:KLM-5678,make:Suzuki,model:Swift,transmission:Automatic,year:2019,category:Economy
+type:CommercialVan,plate:NOP-9012,make:Fiat,model:Ducato,transmission:Automatic,year:2018,category:Premium
+type:PassengerCar,plate:QRS-3456,make:BMW,model:1 Series,transmission:Automatic,year:2020,category:Standard
+type:PassengerCar,plate:TUV-7890,make:Audi,model:A3,transmission:Automatic,year:2019,category:Economy
+type:PassengerCar,plate:XNX-9901,make:Lancia,model:Delta,transmission:Manual,year:2009,category:Standard

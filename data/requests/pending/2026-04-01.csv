@@ -1,0 +1,2 @@
+type:RentalBookingRequest,requestId:RBQ202604010001,referenceId:RF1774626096924587,timestamp:2026-04-01T12:00:00,vat:111222333,startDate:2026-04-05,endDate:2026-04-10,category:Premium
+type:RentalBookingRequest,requestId:RBQ202604010002,referenceId:RF1774626096924588,timestamp:2026-04-01T13:00:00,vat:444555666,startDate:2026-04-06,endDate:2026-04-15,category:Premium
