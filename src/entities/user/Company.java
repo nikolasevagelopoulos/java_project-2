@@ -17,7 +17,6 @@ public class Company extends Customer {
 
     @Override
     public void fromCSV(String csvLine) {
-        // Παράδειγμα: "COMPANY,tuc_rentals,pass123,099999999"
         String[] parts = csvLine.split(",");
         this.role = "COMPANY";
         

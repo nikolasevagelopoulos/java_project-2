@@ -17,7 +17,6 @@ public class Admin extends User {
 
     @Override
     public void fromCSV(String csvLine) {
-        // Παράδειγμα: "ADMIN,admin_user,pass123"
         String[] parts = csvLine.split(",");
         this.role = "ADMIN";
         

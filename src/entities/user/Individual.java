@@ -17,10 +17,9 @@ public class Individual extends Customer {
 
     @Override
     public void fromCSV(String csvLine) {
-        // Παράδειγμα: "INDIVIDUAL,nikos,pass123,444555666"
         String[] parts = csvLine.split(",");
+        this.role = "INDIVIDUAL";
         
-        this.role = parts[0].trim();
         this.username = parts[1].trim();
         this.password = parts[2].trim();
         this.vat = parts[3].trim();

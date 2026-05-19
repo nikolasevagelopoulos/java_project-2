@@ -25,7 +25,6 @@ public class CommercialVan extends Vehicle {
    
     @Override
     public void fromCSV(String csvLine) {
-        // Παράδειγμα: "VAN,XYZ-9876,Standard,150.0"
         String[] parts = csvLine.split(",");
         
         this.licensePlate = parts[1].trim();

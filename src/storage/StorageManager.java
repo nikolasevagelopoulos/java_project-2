@@ -30,28 +30,16 @@ public class StorageManager {
     public StorableList<Vehicle> loadFleet() {
         StorableList<Vehicle> fleetList = new StorableList<>();
         File file = new File(FLEET_FILE); 
-        if (!file.exists()) {
-            System.out.println("Δεν βρέθηκε το αρχείο στόλου: " + file.getAbsolutePath());
-            return fleetList;
-        }
+        if (!file.exists()) return fleetList;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
                 String[] parts = line.split(",");
-                Vehicle vehicle = null;
-                
-                if (parts[0].trim().equalsIgnoreCase("PASSENGER")) {
-                    vehicle = new PassengerCar();
-                } else if (parts[0].trim().equalsIgnoreCase("VAN")) {
-                    vehicle = new CommercialVan();
-                }
-                
-                if (vehicle != null) {
-                    vehicle.fromCSV(line);
-                    fleetList.add(vehicle);
-                }
+                Vehicle vehicle = parts[0].trim().equalsIgnoreCase("PASSENGER") ? new PassengerCar() : new CommercialVan();
+                vehicle.fromCSV(line);
+                fleetList.add(vehicle);
             }
         } catch (IOException e) {
             System.err.println("Σφάλμα κατά την ανάγνωση του στόλου: " + e.getMessage());
@@ -62,10 +50,7 @@ public class StorageManager {
     public StorableList<User> loadUsers() {
         StorableList<User> userList = new StorableList<>();
         File file = new File(USERS_FILE);
-        if (!file.exists()) {
-            System.out.println("Δεν βρέθηκε το αρχείο χρηστών: " + file.getAbsolutePath());
-            return userList;
-        }
+        if (!file.exists()) return userList;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
@@ -104,18 +89,9 @@ public class StorageManager {
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
                 String[] parts = line.split(",");
-                Contract contract = null;
-                
-                if (parts[0].trim().equalsIgnoreCase("CAR")) {
-                    contract = new CarRental();
-                } else if (parts[0].trim().equalsIgnoreCase("VAN")) {
-                    contract = new VanLease();
-                }
-                
-                if (contract != null) {
-                    contract.fromCSV(line);
-                    contractList.add(contract);
-                }
+                Contract contract = parts[0].trim().equalsIgnoreCase("CAR") ? new CarRental() : new VanLease();
+                contract.fromCSV(line);
+                contractList.add(contract);
             }
         } catch (IOException e) {
             System.err.println("Σφάλμα κατά την ανάγνωση συμβολαίων: " + e.getMessage());

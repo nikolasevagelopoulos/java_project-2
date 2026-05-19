@@ -24,10 +24,8 @@ public class PassengerCar extends Vehicle {
 
     @Override
     public void fromCSV(String csvLine) {
-        // Παράδειγμα: "PASSENGER,ABC-1234,Premium,50.0"
         String[] parts = csvLine.split(",");
         
-        // Το parts[0] είναι το "PASSENGER", δεν χρειάζεται να το αποθηκεύσουμε
         this.licensePlate = parts[1].trim();
         this.category = parts[2].trim();
         this.price = Double.parseDouble(parts[3].trim());
