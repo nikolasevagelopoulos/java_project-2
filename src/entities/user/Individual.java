@@ -15,7 +15,7 @@ public class Individual extends Customer {
         return "INDIVIDUAL," + username + "," + password + "," + vat;
     }
 
-    @Override
+   @Override
     public void fromCSV(String csvLine) {
         String[] parts = csvLine.split(",");
         this.role = "INDIVIDUAL";
