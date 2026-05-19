@@ -22,26 +22,14 @@ public class CommercialVan extends Vehicle {
     }
 
     
+   
     @Override
     public void fromCSV(String csvLine) {
+        // Παράδειγμα: "VAN,XYZ-9876,Standard,150.0"
         String[] parts = csvLine.split(",");
         
-        // Σκανάρουμε όλα τα κομμάτια της γραμμής για να βρούμε τα labels
-        for (String part : parts) {
-            part = part.trim();
-            if (part.contains(":")) {
-                String[] keyValue = part.split(":");
-                String key = keyValue[0].trim();
-                String value = keyValue[1].trim();
-                
-                if (key.equalsIgnoreCase("plate")) {
-                    this.licensePlate = value;
-                } else if (key.equalsIgnoreCase("category")) {
-                    this.category = value;
-                } else if (key.equalsIgnoreCase("price")) {
-                    this.price = Double.parseDouble(value);
-                }
-            }
-        }
+        this.licensePlate = parts[1].trim();
+        this.category = parts[2].trim();
+        this.price = Double.parseDouble(parts[3].trim());
     }
 }

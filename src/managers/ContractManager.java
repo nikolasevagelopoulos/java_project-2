@@ -59,4 +59,15 @@ public class ContractManager {
     public StorableList<Contract> getAllContracts() {
         return contracts;
     }
+ // Στον ContractManager.java
+    public Contract getActiveContractById(String referenceId) {
+        for (int i = 0; i < contracts.size(); i++) {
+            Contract c = contracts.get(i);
+            if (c.getContractId().equals(referenceId) && c.getActualEndDate().equals("PENDING")) {
+                return c;
+            }
+        }
+        return null;
+    }
+
 }
