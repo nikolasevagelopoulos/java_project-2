@@ -17,8 +17,8 @@ public class ContractManager {
     public boolean isVehicleAvailable(String plate) {
         for (int i = 0; i < contracts.size(); i++) {
             Contract c = contracts.get(i);
-            if (c.getVehiclePlate().equals(plate) && c.getActualEndDate().equals("PENDING")) {
-                return false; // Το όχημα είναι αυτή τη στιγμή νοικιασμένο
+            if (c.getLicensePlate().equals(plate) && c.getActualEndDate().equals("PENDING")) {
+                return false; 
             }
         }
         return true;
@@ -27,7 +27,7 @@ public class ContractManager {
     public Contract findActiveContractByPlate(String plate) {
         for (int i = 0; i < contracts.size(); i++) {
             Contract c = contracts.get(i);
-            if (c.getVehiclePlate().equals(plate) && c.getActualEndDate().equals("PENDING")) {
+            if (c.getLicensePlate().equals(plate) && c.getActualEndDate().equals("PENDING")) {
                 return c;
             }
         }
@@ -37,7 +37,7 @@ public class ContractManager {
     public boolean cancelContract(String referenceId, String currentDate) {
         for (int i = 0; i < contracts.size(); i++) {
             Contract c = contracts.get(i);
-            if (c.getReferenceId().equals(referenceId) && c.getActualEndDate().equals("PENDING")) {
+            if (c.getContractId().equals(referenceId) && c.getActualEndDate().equals("PENDING")) {
                 c.setActualEndDate("CANCELED_" + currentDate);
                 return true;
             }
@@ -48,7 +48,7 @@ public class ContractManager {
     public Contract completeContract(String referenceId, String actualReturnDate) {
         for (int i = 0; i < contracts.size(); i++) {
             Contract c = contracts.get(i);
-            if (c.getReferenceId().equals(referenceId) && c.getActualEndDate().equals("PENDING")) {
+            if (c.getContractId().equals(referenceId) && c.getActualEndDate().equals("PENDING")) {
                 c.setActualEndDate(actualReturnDate);
                 return c;
             }
