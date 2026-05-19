@@ -67,4 +67,17 @@ public class UserManager {
     public void setAllUsers(StorableList<User> loadedUsers) {
         this.users = loadedUsers;
     }
-}
+    public entities.user.User getUserByVat(String vat) {
+        for (int i = 0; i < users.size(); i++) {
+            entities.user.User u = users.get(i);
+            if (u instanceof entities.user.Customer) {
+                entities.user.Customer c = (entities.user.Customer) u;
+                if (c.getVat().equals(vat)) {
+                    return c;
+                }
+            }
+        }
+        return null;
+    }
+  }
+

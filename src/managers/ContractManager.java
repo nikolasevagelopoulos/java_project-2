@@ -10,20 +10,53 @@ public class ContractManager {
         this.contracts = loadedContracts;
     }
 
-    // Δημιουργία 
     public void createContract(Contract contract) {
         contracts.add(contract);
-        System.out.println("Το συμβόλαιο δημιουργήθηκε: " + contract.getReferenceId());
     }
 
-    // Ακύρωση (Επιτρέπεται ως και μια ημέρα πριν την έναρξη) [cite: 75, 91]
-    public boolean cancelContract(String referenceId, String currentDate) {
-        // TODO: Εύρεση συμβολαίου, έλεγχος ημερομηνίας, αλλαγή κατάστασης σε "CANCELED"
+    public boolean isVehicleAvailable(String plate) {
+        for (int i = 0; i < contracts.size(); i++) {
+            Contract c = contracts.get(i);
+            if (c.getVehiclePlate().equals(plate) && c.getActualEndDate().equals("PENDING")) {
+                return false; // Το όχημα είναι αυτή τη στιγμή νοικιασμένο
+            }
+        }
         return true;
     }
 
-    // Ολοκλήρωση / Επιστροφή 
-    public void completeContract(String referenceId, String returnDate) {
-        // TODO: Ενημέρωση της πραγματικής ημερομηνίας επιστροφής [cite: 77]
+    public Contract findActiveContractByPlate(String plate) {
+        for (int i = 0; i < contracts.size(); i++) {
+            Contract c = contracts.get(i);
+            if (c.getVehiclePlate().equals(plate) && c.getActualEndDate().equals("PENDING")) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    public boolean cancelContract(String referenceId, String currentDate) {
+        for (int i = 0; i < contracts.size(); i++) {
+            Contract c = contracts.get(i);
+            if (c.getReferenceId().equals(referenceId) && c.getActualEndDate().equals("PENDING")) {
+                c.setActualEndDate("CANCELED_" + currentDate);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Contract completeContract(String referenceId, String actualReturnDate) {
+        for (int i = 0; i < contracts.size(); i++) {
+            Contract c = contracts.get(i);
+            if (c.getReferenceId().equals(referenceId) && c.getActualEndDate().equals("PENDING")) {
+                c.setActualEndDate(actualReturnDate);
+                return c;
+            }
+        }
+        return null;
+    }
+
+    public StorableList<Contract> getAllContracts() {
+        return contracts;
     }
 }

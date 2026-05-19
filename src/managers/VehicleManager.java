@@ -1,5 +1,7 @@
 package managers;
 
+import entities.vehicles.CommercialVan;
+import entities.vehicles.PassengerCar;
 import entities.vehicles.Vehicle;
 import storage.StorableList;
 
@@ -10,22 +12,28 @@ public class VehicleManager {
         this.fleet = loadedFleet;
     }
 
-    // Προσθήκη νέου οχήματος 
     public void addVehicle(Vehicle vehicle) {
         fleet.add(vehicle);
     }
 
-    // Έλεγχος διαθεσιμότητας και επιστροφή κατάλληλου οχήματος 
-    // (Στην πράξη θα πρέπει να ελέγχει και τα ενεργά συμβόλαια για να δει αν λείπει)
-    public Vehicle findAvailableVehicle(String category, String type) {
+    public Vehicle findAvailableVehicle(String category, String type, ContractManager contractManager) {
         for (int i = 0; i < fleet.size(); i++) {
             Vehicle v = fleet.get(i);
+            
             if (v.getCategory().equals(category)) {
-                // Εδώ θα έμπαινε η λογική: "Είναι ενοικιασμένο αυτή τη στιγμή;"
-                return v;
+                // Έλεγχος τύπου οχήματος
+                boolean isCorrectType = (type.equals("PASSENGER") && v instanceof PassengerCar) || 
+                                        (type.equals("VAN") && v instanceof CommercialVan);
+                
+                if (isCorrectType) {
+                    // Έλεγχος διαθεσιμότητας μέσω του ContractManager
+                    if (contractManager.isVehicleAvailable(v.getLicensePlate())) {
+                        return v;
+                    }
+                }
             }
         }
-        return null; // Δεν βρέθηκε διαθέσιμο
+        return null; // Κανένα διαθέσιμο όχημα
     }
 
     public StorableList<Vehicle> getFleet() {
