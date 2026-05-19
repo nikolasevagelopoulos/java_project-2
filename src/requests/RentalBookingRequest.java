@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 public class RentalBookingRequest extends Request {
-    private String vehicleCategory; // Economy, Standard, Premium [cite: 70]
+    private String vehicleCategory;
     private LocalDateTime rentalStartDate;
     private LocalDateTime rentalEndDate;
     
@@ -13,6 +13,10 @@ public class RentalBookingRequest extends Request {
         this.vehicleCategory = vehicleCategory;
         this.rentalStartDate = start;
         this.rentalEndDate = end;
+    }
+    
+    public RentalBookingRequest() {
+        super();
     }
     
     public String getVehicleCategory() { return vehicleCategory; }
@@ -27,5 +31,22 @@ public class RentalBookingRequest extends Request {
     @Override
     public String getType() {
         return "BOOKING";
+    }
+
+    @Override
+    public String toCSV() {
+        return "BOOKING," + requestId + "," + referenceId + "," + timestamp + "," + customerVat + "," + vehicleCategory + "," + rentalStartDate + "," + rentalEndDate;
+    }
+
+    @Override
+    public void fromCSV(String csvLine) {
+        String[] parts = csvLine.split(",");
+        this.requestId = parts[1];
+        this.referenceId = parts[2];
+        this.timestamp = LocalDateTime.parse(parts[3]);
+        this.customerVat = parts[4];
+        this.vehicleCategory = parts[5];
+        this.rentalStartDate = LocalDateTime.parse(parts[6]);
+        this.rentalEndDate = LocalDateTime.parse(parts[7]);
     }
 }

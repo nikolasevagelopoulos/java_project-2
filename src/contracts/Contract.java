@@ -1,8 +1,9 @@
 package contracts;
 
 import java.time.LocalDateTime;
+import storage.Storable; // Import the Storable interface
 
-public abstract class Contract {
+public abstract class Contract implements Storable { // Implement Storable here
     protected String contractId;
     protected String customerVat;
     protected String licensePlate;
@@ -10,7 +11,7 @@ public abstract class Contract {
     protected LocalDateTime endDate;
     protected double estimatedCost;
     protected LocalDateTime creationDate;
-    protected String actualEndDate; // "PENDING", "CANCELED_...", or actual return date
+    protected String actualEndDate; // "PENDING", "CANCELED_...", or return date
     
     public Contract(String contractId, String customerVat, String licensePlate, LocalDateTime startDate, LocalDateTime endDate, double estimatedCost) {
         this.contractId = contractId;

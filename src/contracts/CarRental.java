@@ -11,6 +11,10 @@ public class CarRental extends Contract {
         this.dailyRate = dailyRate; 
     }
 
+    public CarRental() {
+        super(null, null, null, null, null, 0.0);
+    }
+
     private static double calculateEstimatedCost(LocalDateTime start, LocalDateTime end, double dailyRate) {
         long days = ChronoUnit.DAYS.between(start, end);
         if (days <= 0) days = 1;
@@ -18,18 +22,31 @@ public class CarRental extends Contract {
     }
 
     @Override
-    public String getContractType() {
-        return "Car Rental";
+    public String getContractType() { return "Car Rental"; }
+
+    @Override
+    public double getRate() { return dailyRate; }
+    
+    @Override
+    public double getDailyRate() { return dailyRate; }
+
+    @Override
+    public String toCSV() {
+        return "CAR," + contractId + "," + customerVat + "," + licensePlate + "," + 
+               startDate + "," + endDate + "," + estimatedCost + "," + actualEndDate + "," + dailyRate;
     }
 
     @Override
-    public double getRate() {
-        return dailyRate;
-    }
-    
-    @Override
-    public double getDailyRate() {
-        return dailyRate;
+    public void fromCSV(String csvLine) {
+        String[] parts = csvLine.split(",");
+        this.contractId = parts[1];
+        this.customerVat = parts[2];
+        this.licensePlate = parts[3];
+        this.startDate = LocalDateTime.parse(parts[4]);
+        this.endDate = LocalDateTime.parse(parts[5]);
+        this.estimatedCost = Double.parseDouble(parts[6]);
+        this.actualEndDate = parts[7];
+        this.dailyRate = Double.parseDouble(parts[8]);
     }
     
     @Override 

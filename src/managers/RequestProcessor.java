@@ -39,7 +39,7 @@ public class RequestProcessor {
                 Customer customer = (Customer) userManager.getUserByVat(bookingReq.getCustomerVat());
                 
                 if (customer != null) {
-                    String vehicleType = (customer instanceof Individual) ? "PASSENGER" : "VAN"; [cite: 26, 27]
+                    String vehicleType = (customer instanceof Individual) ? "PASSENGER" : "VAN"; 
                     Vehicle vehicle = vehicleManager.findAvailableVehicle(bookingReq.getVehicleCategory(), vehicleType, contractManager);
                     
                     if (vehicle != null) {
