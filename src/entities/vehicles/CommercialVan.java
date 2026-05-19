@@ -18,15 +18,30 @@ public class CommercialVan extends Vehicle {
 
     @Override
     public String toCSV() {
-        // Παράδειγμα: "VAN,XYZ-9876,Premium,400.0"
         return "VAN," + licensePlate + "," + category + "," + price;
     }
 
+    
     @Override
     public void fromCSV(String csvLine) {
         String[] parts = csvLine.split(",");
-        this.licensePlate = parts[1];
-        this.category = parts[2];
-        this.price = Double.parseDouble(parts[3]);
+        
+        // Σκανάρουμε όλα τα κομμάτια της γραμμής για να βρούμε τα labels
+        for (String part : parts) {
+            part = part.trim();
+            if (part.contains(":")) {
+                String[] keyValue = part.split(":");
+                String key = keyValue[0].trim();
+                String value = keyValue[1].trim();
+                
+                if (key.equalsIgnoreCase("plate")) {
+                    this.licensePlate = value;
+                } else if (key.equalsIgnoreCase("category")) {
+                    this.category = value;
+                } else if (key.equalsIgnoreCase("price")) {
+                    this.price = Double.parseDouble(value);
+                }
+            }
+        }
     }
 }

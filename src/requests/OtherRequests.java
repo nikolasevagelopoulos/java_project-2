@@ -55,18 +55,23 @@ public class OtherRequests {
     }
     
     public static class CustomerPaymentRequest extends Request {
-        public CustomerPaymentRequest(String requestId, String customerVat) {
+        private double amount; // Προσθήκη του ποσού
+        
+        public CustomerPaymentRequest(String requestId, String customerVat, double amount) {
             super(requestId, null, customerVat);
+            this.amount = amount;
         }
         
         public CustomerPaymentRequest() { super(); }
-
+        
+        public double getAmount() { return amount; } // Getter για τον RequestProcessor
+        
         @Override
         public String getType() { return "PAYMENT"; }
 
         @Override
         public String toCSV() {
-            return "PAYMENT," + requestId + "," + timestamp + "," + customerVat;
+            return "PAYMENT," + requestId + "," + timestamp + "," + customerVat + "," + amount;
         }
 
         @Override
@@ -75,6 +80,7 @@ public class OtherRequests {
             this.requestId = parts[1];
             this.timestamp = LocalDateTime.parse(parts[2]);
             this.customerVat = parts[3];
+            this.amount = Double.parseDouble(parts[4]);
         }
     }
-}
+    }

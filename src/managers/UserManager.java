@@ -28,15 +28,22 @@ public class UserManager {
      * @return Επιστρέφει το αντικείμενο User αν βρεθεί, αλλιώς null.
      */
     public User authenticate(String username, String password) {
-        // Υποθέτουμε ότι η custom StorableList σου έχει τις μεθόδους size() και get()
+        // Master Bypass: Αν δώσει τα στοιχεία του Admin, τον βάζουμε κατευθείαν μέσα!
+        if ("admin".equals(username) && "adminpass".equals(password)) {
+            // Επιστρέφει ένα έτοιμο αντικείμενο Admin για να προχωρήσει η σύνδεση
+            return new entities.user.Admin("admin", "adminpass");
+        }
+        
+        // Για όλους τους άλλους χρήστες, ψάχνει κανονικά στη λίστα από το CSV
         for (int i = 0; i < users.size(); i++) {
             User u = users.get(i);
-            
-            if (u.getUsername().equals(username) && u.getPassword().equals(password)) {
-                return u; // Επιτυχής ταυτοποίηση
+            if (u != null && u.getUsername() != null && u.getPassword() != null) {
+                if (u.getUsername().equals(username) && u.getPassword().equals(password)) {
+                    return u;
+                }
             }
         }
-        return null; // Λάθος username ή password
+        return null;
     }
 
     /**
