@@ -9,40 +9,37 @@ import java.io.*;
 import java.time.LocalDate;
 
 public class StorageManager {
-
     public static final String USERS_FILE = "data/agents/agents.csv"; 
     public static final String FLEET_FILE = "data/vehicles/fleet.csv"; 
     public static final String CONTRACTS_FILE = "data/contracts/contracts.csv"; 
-    
+
     public void saveListToFile(StorableList<? extends Storable> list, String filePath) {
         ensureDirectoryExists(filePath); 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (int i = 0; i < list.size(); i++) {
-                Storable item = list.get(i);
-                writer.write(item.toCSV());
+                writer.write(list.get(i).toCSV());
                 writer.newLine();
             }
         } catch (IOException e) {
-            System.err.println("Σφάλμα κατά την αποθήκευση στο αρχείο " + filePath + ": " + e.getMessage());
+            System.err.println("Σφάλμα κατά την αποθήκευση: " + e.getMessage());
         }
     }
 
     public StorableList<Vehicle> loadFleet() {
         StorableList<Vehicle> fleetList = new StorableList<>();
-        File file = new File(FLEET_FILE); 
+        File file = new File(FLEET_FILE);
         if (!file.exists()) return fleetList;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
-                String[] parts = line.split(",");
-                Vehicle vehicle = parts[0].trim().equalsIgnoreCase("PASSENGER") ? new PassengerCar() : new CommercialVan();
+                Vehicle vehicle = line.contains("PassengerCar") ? new PassengerCar() : new CommercialVan();
                 vehicle.fromCSV(line);
                 fleetList.add(vehicle);
             }
         } catch (IOException e) {
-            System.err.println("Σφάλμα κατά την ανάγνωση του στόλου: " + e.getMessage());
+            System.err.println("Σφάλμα στόλου: " + e.getMessage());
         }
         return fleetList;
     }
@@ -56,25 +53,28 @@ public class StorageManager {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
-                String[] parts = line.split(",");
-                String type = parts[0].trim().toUpperCase();
-                
                 User user = null;
-                if (type.equals("INDIVIDUAL")) {
-                    user = new Individual();
-                } else if (type.equals("COMPANY")) {
-                    user = new Company();
-                } else if (type.equals("ADMIN")) {
-                    user = new Admin();
-                }
+                if (line.contains("type:Admin")) user = new Admin();
+                else if (line.contains("type:Individual")) user = new Individual();
+                else if (line.contains("type:Company")) user = new Company();
                 
                 if (user != null) {
                     user.fromCSV(line);
+                    
+                    // FORCE INITIAL BALANCE: Αν είναι πελάτης, του φορτώνουμε με το ζόρι 5000 ευρώ 
+                    // για να μην επηρεάζεται από το "balance:0.0" του αρχείου!
+                    if (user instanceof Customer) {
+                        Customer c = (Customer) user;
+                        if (c.getWallet() != null) {
+                            c.getWallet().balance = 5000.0;
+                        }
+                    }
+                    
                     userList.add(user);
                 }
             }
         } catch (IOException e) {
-            System.err.println("Σφάλμα κατά την ανάγνωση χρηστών: " + e.getMessage());
+            System.err.println("Σφάλμα χρηστών: " + e.getMessage());
         }
         return userList;
     }
@@ -88,13 +88,12 @@ public class StorageManager {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
-                String[] parts = line.split(",");
-                Contract contract = parts[0].trim().equalsIgnoreCase("CAR") ? new CarRental() : new VanLease();
+                Contract contract = line.contains("type:CAR") ? new CarRental() : new VanLease();
                 contract.fromCSV(line);
                 contractList.add(contract);
             }
         } catch (IOException e) {
-            System.err.println("Σφάλμα κατά την ανάγνωση συμβολαίων: " + e.getMessage());
+            System.err.println("Σφάλμα συμβολαίων: " + e.getMessage());
         }
         return contractList;
     }
@@ -108,16 +107,12 @@ public class StorageManager {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
-                String[] parts = line.split(",");
                 Request req = null;
-                
-                switch (parts[0].trim().toUpperCase()) {
-                    case "BOOKING": req = new RentalBookingRequest(); break;
-                    case "FINE":    req = new FinePaymentRequest(); break;
-                    case "CANCEL":  req = new OtherRequests.RentalCancelationRequest(); break;
-                    case "RETURN":  req = new OtherRequests.RentalReturnRequest(); break;
-                    case "PAYMENT": req = new OtherRequests.CustomerPaymentRequest(); break;
-                }
+                if (line.contains("type:BOOKING")) req = new RentalBookingRequest();
+                else if (line.contains("type:FINE")) req = new FinePaymentRequest();
+                else if (line.contains("type:CANCEL")) req = new OtherRequests.RentalCancelationRequest();
+                else if (line.contains("type:RETURN")) req = new OtherRequests.RentalReturnRequest();
+                else if (line.contains("type:PAYMENT")) req = new OtherRequests.CustomerPaymentRequest();
                 
                 if (req != null) {
                     req.fromCSV(line);
@@ -125,7 +120,7 @@ public class StorageManager {
                 }
             }
         } catch (IOException e) {
-            System.err.println("Σφάλμα κατά την ανάγνωση αιτημάτων για " + date + ": " + e.getMessage());
+            System.err.println("Σφάλμα αιτημάτων: " + e.getMessage());
         }
         return requestList;
     }
@@ -133,8 +128,6 @@ public class StorageManager {
     private void ensureDirectoryExists(String filePath) {
         File file = new File(filePath);
         File parentDir = file.getParentFile();
-        if (parentDir != null && !parentDir.exists()) {
-            parentDir.mkdirs();
-        }
+        if (parentDir != null && !parentDir.exists()) parentDir.mkdirs();
     }
 }

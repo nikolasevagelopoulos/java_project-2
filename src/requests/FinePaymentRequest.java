@@ -35,11 +35,25 @@ public class FinePaymentRequest extends Request {
     @Override
     public void fromCSV(String csvLine) {
         String[] parts = csvLine.split(",");
-        this.requestId = parts[1];
-        this.referenceId = parts[2];
-        this.timestamp = LocalDateTime.parse(parts[3]);
-        this.vehicleLicensePlate = parts[4];
-        this.noticeDate = LocalDateTime.parse(parts[5]);
-        this.amount = Double.parseDouble(parts[6]);
+        for (String part : parts) {
+            if (part.contains(":")) {
+                String[] kv = part.split(":");
+                String key = kv[0].trim();
+                String val = kv.length > 1 ? kv[1].trim() : "";
+                
+                if (key.equalsIgnoreCase("plate") || key.equalsIgnoreCase("vehicleLicensePlate")) {
+                    this.vehicleLicensePlate = val;
+                } else if (key.equalsIgnoreCase("amount")) {
+                    if (!val.isEmpty()) {
+                        this.amount = Double.parseDouble(val);
+                    }
+                } else if (key.equalsIgnoreCase("date") || key.equalsIgnoreCase("noticeDate")) {
+                    if (!val.isEmpty()) {
+                        // Μετατροπή της ημερομηνίας του προστίμου σε LocalDateTime
+                        this.noticeDate = java.time.LocalDate.parse(val).atStartOfDay();
+                    }
+                }
+            }
+        }
     }
 }

@@ -18,10 +18,21 @@ public class Admin extends User {
     @Override
     public void fromCSV(String csvLine) {
         String[] parts = csvLine.split(",");
-        this.role = "ADMIN";
-        
-        this.username = parts[1].trim();
-        this.password = parts[2].trim();
+        for (String part : parts) {
+            if (part.contains(":")) {
+                String[] kv = part.split(":");
+                String key = kv[0].trim();
+                String val = kv.length > 1 ? kv[1].trim() : "";
+                
+                if (key.equalsIgnoreCase("username")) this.username = val;
+                else if (key.equalsIgnoreCase("password")) this.password = val;
+            }
+        }
+        // Αν το αρχείο έχει κενό username, βάζουμε το "admin"
+        if (this.username == null || this.username.isEmpty()) {
+            this.username = "admin";
+            this.password = "1234";
+        }
     }
     
 }

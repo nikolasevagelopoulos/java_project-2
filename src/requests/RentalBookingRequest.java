@@ -41,12 +41,27 @@ public class RentalBookingRequest extends Request {
     @Override
     public void fromCSV(String csvLine) {
         String[] parts = csvLine.split(",");
-        this.requestId = parts[1];
-        this.referenceId = parts[2];
-        this.timestamp = LocalDateTime.parse(parts[3]);
-        this.customerVat = parts[4];
-        this.vehicleCategory = parts[5];
-        this.rentalStartDate = LocalDateTime.parse(parts[6]);
-        this.rentalEndDate = LocalDateTime.parse(parts[7]);
+        for (String part : parts) {
+            if (part.contains(":")) {
+                String[] kv = part.split(":");
+                String key = kv[0].trim();
+                String val = kv.length > 1 ? kv[1].trim() : "";
+                
+                if (key.equalsIgnoreCase("customer") || key.equalsIgnoreCase("customerVat")) {
+                    this.customerVat = val;
+                } else if (key.equalsIgnoreCase("category") || key.equalsIgnoreCase("vehicleCategory")) {
+                    this.vehicleCategory = val;
+                } else if (key.equalsIgnoreCase("start") || key.equalsIgnoreCase("rentalStartDate")) {
+                    // Αν το CSV έχει ημερομηνία σε στυλ YYYY-MM-DD, τη μετατρέπουμε σε LocalDateTime
+                    if (!val.isEmpty()) {
+                        this.rentalStartDate = java.time.LocalDate.parse(val).atStartOfDay();
+                    }
+                } else if (key.equalsIgnoreCase("end") || key.equalsIgnoreCase("rentalEndDate")) {
+                    if (!val.isEmpty()) {
+                        this.rentalEndDate = java.time.LocalDate.parse(val).atStartOfDay();
+                    }
+                }
+            }
+        }
     }
 }

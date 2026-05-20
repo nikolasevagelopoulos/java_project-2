@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Wallet {
-	private double balance;
+	public double balance;
 	private List<Statement> history;
 	
 	public Wallet() {

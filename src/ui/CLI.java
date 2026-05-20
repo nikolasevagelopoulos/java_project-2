@@ -130,16 +130,18 @@ public class CLI {
             while (systemDate.isBefore(targetDate) || systemDate.isEqual(targetDate)) {
                 System.out.println("Επεξεργασία ημέρας: " + systemDate);
                 
-                // Φόρτωση των πραγματικών αιτημάτων της ημέρας από τα CSV αρχεία του καθηγητή [cite: 56, 121]
-                StorableList<Request> dailyRequests = storageManager.loadRequestsForDate(systemDate);
+                // 1. Φόρτωση αιτημάτων της συγκεκριμένης ημέρας
+                StorableList<requests.Request> dailyRequests = storageManager.loadRequestsForDate(systemDate);
                 
-                // Δρομολόγηση επεξεργασίας [cite: 92, 121]
-                requestProcessor.processDailyRequests(dailyRequests, systemDate);
+                // 2. Δυναμική επεξεργασία από τον Processor
+                if (dailyRequests != null && dailyRequests.size() > 0) {
+                    requestProcessor.processDailyRequests(dailyRequests, systemDate);
+                }
                 
-                systemDate = systemDate.plusDays(1); // Πέρασμα στην επόμενη μέρα
+                // Πέρασμα στην επόμενη μέρα
+                systemDate = systemDate.plusDays(1);
             }
             System.out.println("Η προσομοίωση ολοκληρώθηκε.");
-            
         } catch (DateTimeParseException e) {
             System.out.println("Λάθος μορφή ημερομηνίας.");
         }

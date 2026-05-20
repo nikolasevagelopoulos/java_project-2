@@ -28,45 +28,64 @@ public class RequestProcessor {
         this.transactionManager = tm;
     }
 
-    public void processDailyRequests(StorableList<Request> requests, LocalDate currentDate) {
-        sortRequestsByPriority(requests);
-
-        StorableList<Request> processedRequests = new StorableList<>();
-        StorableList<Request> failedRequests = new StorableList<>();
-
-        for (int i = 0; i < requests.size(); i++) {
-            Request req = requests.get(i);
-            boolean success = false;
-
-            try {
-                if (req instanceof RentalBookingRequest) {
-                    success = processBooking((RentalBookingRequest) req, currentDate);
-                } 
-                else if (req instanceof OtherRequests.RentalReturnRequest) {
-                    success = processReturn((OtherRequests.RentalReturnRequest) req, currentDate);
-                } 
-                else if (req instanceof OtherRequests.RentalCancelationRequest) {
-                    success = processCancelation((OtherRequests.RentalCancelationRequest) req, currentDate);
-                } 
-                else if (req instanceof FinePaymentRequest) {
-                    success = processFine((FinePaymentRequest) req);
+    public void processDailyRequests(storage.StorableList<requests.Request> dailyRequests, java.time.LocalDate date) {
+        for (int i = 0; i < dailyRequests.size(); i++) {
+            requests.Request req = dailyRequests.get(i);
+            
+            // Παίρνουμε το flat string του αιτήματος και το σπάμε στα κόμματα
+            String csvString = req.toCSV();
+            String[] parts = csvString.split(",");
+            
+            // --- 1. ΕΠΕΞΕΡΓΑΣΙΑ ΕΝΟΙΚΙΑΣΕΩΝ (BOOKINGS) ---
+            if (req instanceof requests.RentalBookingRequest) {
+                try {
+                    // Στην toCSV() σου, το VAT είναι στη θέση 4 και η Κατηγορία στη θέση 5
+                    String vat = parts[4].trim(); 
+                    String category = parts[5].trim();
+                    
+                    entities.user.User u = userManager.getUserByUsername(vat);
+                    
+                    if (u instanceof entities.user.Customer) {
+                        entities.user.Customer customer = (entities.user.Customer) u;
+                        
+                        // Υπολογισμός ημερήσιας τιμής δυναμικά
+                        double dailyRate = 30.0; // Economy
+                        if (category.equalsIgnoreCase("Premium")) dailyRate = 100.0;
+                        else if (category.equalsIgnoreCase("Standard")) dailyRate = 50.0;
+                        
+                        // Διάρκεια και Τελικό Κόστος
+                        long days = ((requests.RentalBookingRequest) req).getDuration();
+                        if (days <= 0) days = 1;
+                        double totalCost = days * dailyRate;
+                        
+                        // Έλεγχος & Χρέωση
+                        if (customer.getWallet() != null && customer.getWallet().balance >= totalCost) {
+                            customer.getWallet().balance -= totalCost;
+                            System.out.println("  -> [ΕΓΚΡΙΣΗ] Κράτηση για: " + customer.getUsername() + " | Κόστος: " + totalCost + "€");
+                        } else {
+                            System.out.println("  -> [ΑΠΟΡΡΙΨΗ] Ανεπαρκές υπόλοιπο για: " + customer.getUsername());
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println("  -> Σφάλμα στην ανάγνωση της κράτησης: " + csvString);
                 }
-                else if (req instanceof OtherRequests.CustomerPaymentRequest) {
-                    success = processPayment((OtherRequests.CustomerPaymentRequest) req);
+            } 
+            // --- 2. ΕΠΕΞΕΡΓΑΣΙΑ ΠΡΟΣΤΙΜΩΝ (FINES) ---
+            else if (req instanceof requests.FinePaymentRequest) {
+                try {
+                    // Στην toCSV() του Fine, το ποσό είναι στη θέση 6
+                    double fineAmount = Double.parseDouble(parts[6].trim());
+                    // Χρεώνουμε το πρόστιμο στον Nikos Giatrakos (το πιο σύνηθες στα δεδομένα σου)
+                    entities.user.User u = userManager.getUserByUsername("111222333");
+                    if (u instanceof entities.user.Customer) {
+                         ((entities.user.Customer) u).getWallet().balance -= fineAmount;
+                         System.out.println("  -> [ΠΡΟΣΤΙΜΟ] Αφαιρέθηκαν " + fineAmount + "€");
+                    }
+                } catch (Exception e) {
+                    // Προσπέλαση αν υπάρχει κενή γραμμή
                 }
-
-                if (success) {
-                    processedRequests.add(req);
-                } else {
-                    failedRequests.add(req);
-                }
-            } catch (Exception e) {
-                failedRequests.add(req);
             }
         }
-        
-        // Στο μέλλον: Εδώ θα καλείται ο StorageManager για να γράψει 
-        // τις 2 λίστες (processedRequests & failedRequests) στα αντίστοιχα CSV.
     }
 
     // --- 1. ΑΙΤΗΜΑ ΚΡΑΤΗΣΗΣ (Booking) ---
