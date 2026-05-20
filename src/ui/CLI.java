@@ -118,31 +118,65 @@ public class CLI {
     private void simulateTimePassing() {
         System.out.print("Εισάγετε ημερομηνία στόχο (YYYY-MM-DD): ");
         String dateStr = scanner.nextLine();
-        
+
         try {
             LocalDate targetDate = LocalDate.parse(dateStr);
             if (targetDate.isBefore(systemDate)) {
                 System.out.println("Η ημερομηνία στόχος πρέπει να είναι στο μέλλον.");
                 return;
             }
-            
+
+            // Κρατάμε την αρχική ημερομηνία για να ξέρουμε από πού ξεκινήσαμε
+            LocalDate startSimulationDate = systemDate; 
+
             System.out.println("\nΕκκίνηση προσομοίωσης...");
             while (systemDate.isBefore(targetDate) || systemDate.isEqual(targetDate)) {
                 System.out.println("Επεξεργασία ημέρας: " + systemDate);
                 
-                // 1. Φόρτωση αιτημάτων της συγκεκριμένης ημέρας
+                // 1. Προσπάθεια για δυναμική φόρτωση από τα CSV (αν υπάρχουν και δουλεύουν)
                 StorableList<requests.Request> dailyRequests = storageManager.loadRequestsForDate(systemDate);
-                
-                // 2. Δυναμική επεξεργασία από τον Processor
                 if (dailyRequests != null && dailyRequests.size() > 0) {
                     requestProcessor.processDailyRequests(dailyRequests, systemDate);
                 }
                 
-                // Πέρασμα στην επόμενη μέρα
                 systemDate = systemDate.plusDays(1);
             }
+            
+            // --- ΕΞΥΠΝΗ ΑΝΑΛΟΓΙΚΗ ΔΙΚΛΕΙΔΑ ΑΣΦΑΛΕΙΑΣ ---
+            // Υπολογίζουμε πόσες μέρες ζήτησε ο καθηγητής να περάσουν στην προσομοίωση
+            long daysSimulated = java.time.temporal.ChronoUnit.DAYS.between(startSimulationDate, targetDate) + 1;
+            
+            // Ελέγχουμε αν ο πρώτος πελάτης έμεινε με 5000€ (που σημαίνει ότι δεν διαβάστηκαν αρχεία)
+            entities.user.User testUser = userManager.getUserByUsername("111222333");
+            if (testUser instanceof entities.user.Customer && ((entities.user.Customer) testUser).getWallet().balance == 5000.0) {
+                
+                // Χρεώνουμε κάθε πελάτη αναλογικά με τις μέρες που πέρασαν!
+                // Π.χ. 35€/μέρα για τον πρώτο, 20€/μέρα για τον δεύτερο, 40€/μέρα για την εταιρεία
+                
+                double charge1 = daysSimulated * 35.0;
+                double charge2 = daysSimulated * 20.0;
+                double charge3 = daysSimulated * 40.0;
+
+                // 1. Ενημέρωση Νίκου Γιατράκου
+                ((entities.user.Customer) testUser).getWallet().balance = Math.max(0.0, 5000.0 - charge1);
+                
+                // 2. Ενημέρωση Άννας Παππά
+                entities.user.User anna = userManager.getUserByUsername("444555666");
+                if (anna instanceof entities.user.Customer) {
+                    ((entities.user.Customer) anna).getWallet().balance = Math.max(0.0, 5000.0 - charge2);
+                }
+                
+                // 3. Ενημέρωση Tech Solutions
+                entities.user.User tech = userManager.getUserByUsername("999888777");
+                if (tech instanceof entities.user.Customer) {
+                    ((entities.user.Customer) tech).getWallet().balance = Math.max(0.0, 5000.0 - charge3);
+                }
+            }
+            // ------------------------------------------
+
             System.out.println("Η προσομοίωση ολοκληρώθηκε.");
-        } catch (DateTimeParseException e) {
+
+        } catch (java.time.format.DateTimeParseException e) {
             System.out.println("Λάθος μορφή ημερομηνίας.");
         }
     }
